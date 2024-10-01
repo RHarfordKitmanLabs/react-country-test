@@ -40,3 +40,11 @@
 .read-the-docs {
   color: #888;
 }
+
+.blueButton {
+  background-color: blue;
+}
+
+.redButton {
+  background-color: red;
+}
