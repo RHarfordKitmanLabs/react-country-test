@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 
-type answerDictionary = { [key: string]: { answer: string } };
+type AnswerDictionary = { [key: string]: { answer: string } };
 
-type countries = { [key: string]: { capital: string } };
+type Countries = { [key: string]: { capital: string } };
 
 function App() {
-  const [countries, setCountries] = useState<countries>({
+  const [countries, setCountries] = useState<Countries>({
     Afghanistan: {
       capital: "Kabul",
     },
@@ -19,17 +19,20 @@ function App() {
       capital: "Alger",
     },
   });
-  const answerDictionary: answerDictionary = {};
-  const [selection, setSelection] = useState<string[]>([]);
+  const answerDictionary: AnswerDictionary = useMemo(() => {
+    const dictionary: AnswerDictionary = {};
+    Object.entries(countries).forEach(([country, { capital }]) => {
+      dictionary[country] = {
+        answer: capital,
+      };
+      dictionary[capital] = {
+        answer: country,
+      };
+    });
+    return dictionary;
+  }, [countries]);
 
-  Object.entries(countries).forEach(([country, { capital }]) => {
-    answerDictionary[country] = {
-      answer: capital,
-    };
-    answerDictionary[capital] = {
-      answer: country,
-    };
-  });
+  const [selection, setSelection] = useState<string[]>([]);
 
   const removePair = (secondSelectedItem: string) => {
     const firstSelectedItem: string = selection[0];
@@ -57,20 +60,10 @@ function App() {
     }
   };
 
-  const calcColor = (valueToCheck: string): string => {
-    const valuePresent = selection.includes(valueToCheck);
-    if (!valuePresent) return "default";
-
-    switch (selection.length) {
-      case 0:
-        return "default";
-      case 1:
-        return "blueButton";
-      case 2:
-        return "redButton";
-      default:
-        return "default";
-    }
+  const calcColor = (value: string): string => {
+    const isSelected = selection.includes(value);
+    if (!isSelected) return "default";
+    return selection.length === 1 ? "blueButton" : "redButton";
   };
 
   return (
